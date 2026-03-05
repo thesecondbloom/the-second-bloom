@@ -464,21 +464,29 @@ body {
 .save-fav-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   background: none;
   border: 1px solid var(--terra-light);
   color: var(--terra);
   font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 10px 16px;
+  min-height: 44px;
+  border-radius: 22px;
   cursor: pointer;
   transition: all var(--transition);
   margin-top: 4px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 .save-fav-btn:hover { background: var(--terra); color: #fff; }
+.save-fav-btn:active { background: var(--terra); color: #fff; transform: scale(0.96); }
 .save-fav-btn.saved { background: var(--sage); border-color: var(--sage); color: #fff; }
+.save-fav-btn.saved:active { background: var(--sage-dark, #6e8a62); transform: scale(0.96); }
 
 /* ═══ CARD TRAY ═══ */
 .card-tray {

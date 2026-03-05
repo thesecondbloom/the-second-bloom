@@ -311,4 +311,25 @@
     updateCardDisplay();
     updateFavoritesDisplay();
   }
+
+  // Robust event binding: attach listeners directly as backup to inline onclick
+  // This ensures taps register on mobile even if inline handlers fail
+  var saveBtnEl = document.getElementById('saveFavBtn');
+  if (saveBtnEl) {
+    saveBtnEl.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleFavorite();
+    });
+    // Remove inline handler to prevent double-fire
+    saveBtnEl.removeAttribute('onclick');
+  }
+
+  var shareBtnEl = document.getElementById('shareCardBtn');
+  if (shareBtnEl) {
+    shareBtnEl.addEventListener('click', function(e) {
+      e.stopPropagation();
+      shareCard();
+    });
+    shareBtnEl.removeAttribute('onclick');
+  }
 })();
