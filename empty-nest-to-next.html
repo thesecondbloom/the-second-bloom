@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Empty Nest to Next</title>
+  <!-- ============================================================
+       FONTS — Cormorant Garamond (headings) + DM Sans (body)
+       ============================================================ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       DESIGN TOKENS — edit these to restyle the whole product
+       ============================================================ */
+    :root {
+      /* Colors — Jenna Kutcher-inspired: periwinkle + dusty rose + warm cream */
+      --color-bg:            #FAF8F5;   /* warm cream white — page background */
+      --color-surface:       #F0EDF8;   /* soft lavender blush — pause/card backgrounds */
+      --color-text:          #2D2B35;   /* deep plum charcoal — primary text */
+      --color-text-muted:    #7B7890;   /* muted mauve — secondary text */
+      --color-sage:          #8B9FD4;   /* periwinkle — progress, accents (replaces sage) */
+      --color-sage-light:    #D4DAF0;   /* soft periwinkle mist — inactive progress */
+      --color-terra:         #C4899A;   /* dusty rose — primary CTA (replaces terracotta) */
+      --color-terra-light:   #EDD8DF;   /* blush petal — hover tints */
+      --color-border:        #E5E0EE;   /* lavender whisper — borders, dividers */
+      --color-input-bg:      #FFFFFF;   /* pure white — input fields */
+      --color-disabled:      #C5C0D4;   /* soft mauve gray — disabled states */
+      /* Typography */
+      --font-heading:        'Cormorant Garamond', Georgia, serif;
+      --font-body:           'DM Sans', system-ui, sans-serif;
+      /* Spacing (8px base unit) */
+      --sp-1: 8px;
+      --sp-2: 16px;
+      --sp-3: 24px;
+      --sp-4: 32px;
+      --sp-5: 48px;
+      --sp-6: 64px;
+      --sp-7: 96px;
+      /* Layout */
+      --content-max:  620px;
+      --page-pad-x:   24px;
+      --page-pad-y:   40px;
+      /* Transitions */
+      --transition-screen: 400ms ease;
+      --transition-fast:   200ms ease;
+    }
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      font-size: 18px;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-weight: 400;
+      line-height: 1.75;
+      letter-spacing: 0.01em;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+    }
+    /* When cover is showing lock scroll */
+    body.cover-visible {
+      overflow: hidden;
+      background: #EDE7F6;
+    }
+    /* ============================================================
+       LAYOUT — single centered column, natural height
+       ============================================================ */
+    #app {
+      width: 100%;
+      max-width: var(--content-max);
+      padding: var(--page-pad-y) var(--page-pad-x);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* ============================================================
+       PROGRESS BAR
+       ============================================================ */
+    #progress-bar {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      opacity: 0;
+      height: 0;
+      margin-bottom: 0;
+      overflow: hidden;
+      flex-shrink: 0;
+      transition: opacity var(--transition-screen), height 400ms ease, margin-bottom 400ms ease;
+    }
+    #progress-bar.visible {
+      opacity: 1;
+      height: 3px;
+      margin-bottom: var(--sp-5);
+    }
+    .progress-segment {
+      flex: 1;
+      height: 3px;
+      border-radius: 4px;
+      background-color: var(--color-sage-light);
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-segment .fill {
+      position: absolute;
+      inset: 0;
+      background-color: var(--color-sage);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 600ms ease;
+    }
+    .progress-segment.active .fill  { transform: scaleX(0.5); }
+    .progress-segment.complete .fill { transform: scaleX(1); }
+    /* ============================================================
+       SCREENS — only one visible at a time, natural height
+       ============================================================ */
+    .screen {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      animation: screenFadeIn var(--transition-screen) ease forwards;
+    }
+    .screen.active {
+      display: flex;
+    }
+    @keyframes screenFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* ============================================================
+       TYPOGRAPHY
+       ============================================================ */
+    .chapter-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-sage);
+      margin-bottom: var(--sp-2);
+    }
+    h1, h2 {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.3;
+      color: var(--color-text);
+    }
+    h1 { font-size: clamp(28px, 6vw, 38px); }
+    h2 { font-size: clamp(22px, 4.5vw, 28px); }
+    p {
+      color: var(--color-text);
+      margin-bottom: var(--sp-3);
+    }
+    p:last-of-type {
+      margin-bottom: 0;
+    }
+    .text-muted {
+      color: var(--color-text-muted);
+      font-size: 15px;
+    }
+    em {
+      font-style: italic;
+      font-family: var(--font-heading);
+      font-size: 1.1em;
+      font-weight: 300;
+    }
+    /* ============================================================
+       CONTENT AREA
+       ============================================================ */
+    .screen-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--sp-4);
+      padding: var(--sp-3) 0;
+    }
+    /* Pause card — cream background for validation moments */
+    .pause-card {
+      background-color: var(--color-surface);
+      border-radius: 16px;
+      padding: var(--sp-4);
+    }
+    .pause-card p {
+      color: var(--color-text);
+      line-height: 1.8;
+    }
+    /* Thin ornamental divider */
+    .ornament {
+      width: 48px;
+      height: 1px;
+      background-color: var(--color-border);
+      margin: var(--sp-3) auto;
+    }
+    /* ============================================================
+       TEXT INPUT / TEXTAREA
+       ============================================================ */
+    .prompt-input {
+      width: 100%;
+      min-height: 130px;
+      background-color: var(--color-input-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: var(--sp-2);
+      font-family: var(--font-body);
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--color-text);
+      line-height: 1.7;
+      resize: none;
+      outline: none;
+      transition: border-color var(--transition-fast);
+      overflow: hidden;
+    }
+    .prompt-input::placeholder {
+      color: var(--color-disabled);
+    }
+    .prompt-input:focus {
+      border-color: var(--color-sage);
+      border-width: 1.5px;
+    }
+    .privacy-note {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      text-align: center;
+      margin-top: var(--sp-1);
+    }
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-2);
+      padding-top: var(--sp-4);
+      padding-bottom: var(--sp-2);
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-terra);
+      color: #FFFFFF;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border: none;
+      border-radius: 40px;
+      padding: 14px 40px;
+      cursor: pointer;
+      min-width: 200px;
+      width: 100%;
+      transition: opacity var(--transition-fast);
+    }
+    .btn-primary:hover,
+    .btn-primary:focus-visible {
+      opacity: 0.88;
+      outline: none;
+    }
+    .btn-secondary {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 8px 16px;
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+    .btn-secondary:hover {
+      color: var(--color-text);
+      text-decoration: underline;
+    }
+    /* Back button — left-aligned arrow, sits above primary CTA */
+    .btn-back {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color var(--transition-fast);
+      align-self: flex-start; /* left-align within btn-area */
+    }
+    .btn-back:hover {
+      color: var(--color-text);
+    }
+    .btn-back::before {
+      content: '←';
+      font-size: 15px;
+    }
+    /* ============================================================
+       CHAPTER INTRO
+       ============================================================ */
+    .chapter-intro .chapter-number {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-sage);
+      margin-bottom: var(--sp-2);
+    }
+    /* ============================================================
+       COVER / WELCOME SCREEN — full-bleed illustrated design
+       ============================================================ */
+    #screen-1 {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      padding: var(--page-pad-y) var(--page-pad-x);
+      max-width: var(--content-max);
+      margin: 0 auto;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      overflow: hidden;
+      justify-content: space-between;
+      background: linear-gradient(
+        160deg,
+        #E8EAF6 0%,
+        #EDE7F6 30%,
+        #FAF8F5 65%,
+        #FCF0F3 100%
+      );
+    }
+    /* Decorative botanical SVG layer — fills the screen */
+    #screen-1 .cover-botanical {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* All cover text sits above the botanical layer */
+    #screen-1 .cover-content,
+    #screen-1 .btn-area {
+      position: relative;
+      z-index: 1;
+    }
+    #screen-1 .cover-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--sp-3);
+    }
+    /* Eyebrow label above the title */
+    .cover-eyebrow {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-sage);
+      margin-bottom: var(--sp-1);
+    }
+    /* Main cover title */
+    .cover-title {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(44px, 10vw, 68px);
+      line-height: 1.1;
+      color: var(--color-text);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    /* Decorative gradient rule under title */
+    .cover-rule {
+      width: 56px;
+      height: 1.5px;
+      background: linear-gradient(90deg, var(--color-sage), var(--color-terra));
+      border: none;
+      margin: var(--sp-3) 0;
+    }
+    /* Subtitle beneath rule */
+    .cover-subtitle {
+      font-size: 15px;
+      color: var(--color-text-muted);
+      line-height: 1.8;
+      max-width: 420px;
+    }
+    #screen-1 .btn-area {
+      padding-bottom: var(--sp-4);
+    }
+    .cover-site {
+      font-family: var(--font-body);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+      margin: 0;
+      opacity: 0.7;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+    .cover-site:hover {
+      opacity: 1;
+      color: var(--color-sage);
+    }
+    @media (min-width: 640px) {
+      #screen-1 {
+        border-radius: 20px;
+      }
+      .cover-title    { font-size: clamp(52px, 8vw, 72px); }
+      .cover-subtitle { font-size: 17px; }
+    }
+    /* Used on closing screen 27 */
+    .welcome-title {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--color-text);
+    }
+    /* ============================================================
+       DESKTOP OVERRIDES
+       ============================================================ */
+    @media (min-width: 640px) {
+      :root {
+        --page-pad-x: 48px;
+        --page-pad-y: 64px;
+      }
+      html { font-size: 19px; }
+      .btn-primary {
+        width: auto;
+        min-width: 220px;
+      }
+      .prompt-input {
+        min-height: 150px;
+        font-size: 18px;
+      }
+      .pause-card {
+        padding: var(--sp-5);
+      }
+    }
+    /* ============================================================
+       TABLE OF CONTENTS — toc-row layout
+       ============================================================ */
+    .toc-row {
+      display: flex;
+      gap: var(--sp-3);
+      align-items: flex-start;
+      padding: var(--sp-2) 0;
+    }
+    .toc-num {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 28px;
+      color: var(--color-sage);
+      line-height: 1.2;
+      min-width: 36px;
+      padding-top: 2px;
+    }
+    .toc-body {
+      flex: 1;
+    }
+    .toc-title {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 20px;
+      color: var(--color-text);
+      margin-bottom: var(--sp-1);
+      line-height: 1.3;
+    }
+    .toc-desc {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      line-height: 1.75;
+      margin-bottom: 0;
+    }
+    .toc-divider {
+      width: 100%;
+      height: 1px;
+      background-color: var(--color-border);
+      margin: var(--sp-1) 0;
+    }
+    /* ============================================================
+       JOURNEY SUMMARY — screen 28
+       ============================================================ */
+    #screen-28 .screen-content {
+      justify-content: flex-start;
+      padding-top: var(--sp-3);
+    }
+    .summary-header {
+      margin-bottom: var(--sp-5);
+    }
+    .summary-chapter-block {
+      margin-bottom: var(--sp-5);
+    }
+    .summary-chapter-label {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--color-sage);
+      margin-bottom: var(--sp-2);
+    }
+    .summary-chapter-title {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 22px;
+      color: var(--color-text);
+      margin-bottom: var(--sp-3);
+      line-height: 1.3;
+    }
+    .summary-entry {
+      margin-bottom: var(--sp-4);
+      padding-bottom: var(--sp-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .summary-entry:last-of-type {
+      border-bottom: none;
+    }
+    .summary-question {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      margin-bottom: var(--sp-1);
+    }
+    .summary-answer {
+      font-size: 16px;
+      color: var(--color-text);
+      line-height: 1.8;
+      white-space: pre-wrap;
+      margin: 0;
+    }
+    .summary-empty {
+      font-size: 14px;
+      color: var(--color-disabled);
+      font-style: italic;
+    }
+    /* ============================================================
+       PROGRESS TRACKER — screen 29
+       ============================================================ */
+    #screen-29 .screen-content {
+      justify-content: flex-start;
+      gap: var(--sp-4);
+    }
+    .tracker-win-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp-2);
+      padding: var(--sp-2) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .tracker-win-item:last-of-type {
+      border-bottom: none;
+    }
+    .tracker-win-check {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-sage);
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+    .tracker-win-check.checked {
+      background: var(--color-sage);
+      border-color: var(--color-sage);
+    }
+    .tracker-win-check.checked::after {
+      content: '✓';
+      color: white;
+      font-size: 11px;
+      line-height: 1;
+    }
+    .tracker-win-text {
+      font-size: 15px;
+      color: var(--color-text);
+      line-height: 1.7;
+      flex: 1;
+    }
+    .tracker-win-text.checked {
+      color: var(--color-text-muted);
+      text-decoration: line-through;
+      text-decoration-color: var(--color-sage-light);
+    }
+    .tracker-win-delete {
+      background: none;
+      border: none;
+      color: var(--color-disabled);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0 4px;
+      line-height: 1;
+      transition: color var(--transition-fast);
+    }
+    .tracker-win-delete:hover {
+      color: var(--color-terra);
+    }
+    .tracker-empty-state {
+      font-size: 14px;
+      color: var(--color-disabled);
+      font-style: italic;
+      padding: var(--sp-2) 0;
+    }
+    @media print {
+      #progress-bar, .btn-area, .btn-back { display: none !important; }
+      #screen-28 { display: block !important; }
+      .screen:not(#screen-28) { display: none !important; }
+      body { background: white; }
+      #app { padding: 24px; max-width: 100%; }
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<!-- ============================================================
+     APP SHELL
+     ============================================================ -->
+<div id="app" role="main">
+  <!-- Progress bar — hidden on first 2 screens -->
+  <nav id="progress-bar" aria-label="Journey progress">
+    <div class="progress-segment" id="seg-1"><div class="fill"></div></div>
+    <div class="progress-segment" id="seg-2"><div class="fill"></div></div>
+    <div class="progress-segment" id="seg-3"><div class="fill"></div></div>
+  </nav>
+  <!-- ===========================================================
+       SCREEN 1 — COVER PAGE
+       =========================================================== -->
+  <section class="screen active" id="screen-1" data-screen="1">
+    <!-- Botanical illustration layer -->
+    <svg class="cover-botanical" viewBox="0 0 500 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <!-- Large soft circle, top right -->
+      <circle cx="460" cy="80" r="180" fill="#C5CAE9" opacity="0.18"/>
+      <circle cx="460" cy="80" r="110" fill="#9FA8DA" opacity="0.12"/>
+      <!-- Soft circle, bottom left -->
+      <circle cx="30" cy="720" r="160" fill="#F8BBD9" opacity="0.15"/>
+      <circle cx="30" cy="720" r="90" fill="#F48FB1" opacity="0.10"/>
+      <!-- Botanical stem — top right -->
+      <path d="M420 0 Q400 120 380 200 Q360 280 390 340" stroke="#9FA8DA" stroke-width="1.5" fill="none" opacity="0.5"/>
+      <!-- Leaves on stem -->
+      <ellipse cx="370" cy="140" rx="22" ry="9" fill="#B3BCF5" opacity="0.45" transform="rotate(-30 370 140)"/>
+      <ellipse cx="388" cy="195" rx="18" ry="7" fill="#C5CAE9" opacity="0.4" transform="rotate(20 388 195)"/>
+      <ellipse cx="375" cy="250" rx="20" ry="8" fill="#B3BCF5" opacity="0.38" transform="rotate(-15 375 250)"/>
+      <!-- Small blossoms -->
+      <circle cx="392" cy="340" r="5" fill="#F8BBD9" opacity="0.7"/>
+      <circle cx="382" cy="330" r="3.5" fill="#F48FB1" opacity="0.5"/>
+      <circle cx="402" cy="328" r="4" fill="#F8BBD9" opacity="0.6"/>
+      <!-- Botanical stem — bottom left -->
+      <path d="M60 800 Q80 680 100 600 Q120 520 95 460" stroke="#C8A2C8" stroke-width="1.5" fill="none" opacity="0.45"/>
+      <ellipse cx="112" cy="620" rx="20" ry="8" fill="#E1BEE7" opacity="0.45" transform="rotate(25 112 620)"/>
+      <ellipse cx="96" cy="555" rx="17" ry="7" fill="#CE93D8" opacity="0.35" transform="rotate(-20 96 555)"/>
+      <circle cx="94" cy="460" r="5" fill="#F8BBD9" opacity="0.65"/>
+      <circle cx="104" cy="450" r="3" fill="#F48FB1" opacity="0.5"/>
+      <!-- Delicate scatter dots — mid area -->
+      <circle cx="180" cy="390" r="2" fill="#9FA8DA" opacity="0.4"/>
+      <circle cx="310" cy="420" r="1.5" fill="#C5CAE9" opacity="0.5"/>
+      <circle cx="260" cy="460" r="2.5" fill="#F8BBD9" opacity="0.35"/>
+      <circle cx="340" cy="500" r="1.5" fill="#9FA8DA" opacity="0.3"/>
+      <!-- Thin horizontal divider line (decorative) -->
+      <line x1="40" y1="598" x2="180" y2="598" stroke="#C5CAE9" stroke-width="0.8" opacity="0.5"/>
+    </svg>
+    <!-- Cover content -->
+    <div class="cover-content">
+      <div>
+        <p class="cover-eyebrow">A journey for empty nest moms</p>
+        <h1 class="cover-title">Empty Nest<br>to Next</h1>
+        <hr class="cover-rule" />
+        <p class="cover-subtitle">An interactive next-chapter journey for empty nest moms… meet yourself where you are, and walk toward who you're becoming.</p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(2)">Begin my journey</button>
+      <a href="https://thesndbloom.com" target="_blank" class="cover-site">thesndbloom.com</a>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 2 — WHAT THIS IS
+       =========================================================== -->
+  <section class="screen" id="screen-2" data-screen="2">
+    <div class="screen-content">
+      <div>
+        <p>This is a quiet space — just for you.</p>
+        <p>It's a gentle journey through three chapters, where you get to feel what you're feeling, find your footing again, and take one real step toward what comes next.</p>
+        <p>Move through it all at once, or come back over a few days. There's no right way.<br>No timeline. Just you, at your own pace.</p>
+      </div>
+      <p class="privacy-note">Everything you write stays on your device.<br>Nothing is shared or stored anywhere else.</p>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo('how-to')">Let's begin</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN HOW-TO — HOW TO USE THIS
+       =========================================================== -->
+  <section class="screen" id="screen-how-to" data-screen="how-to">
+    <div class="screen-content">
+      <div>
+        <p class="chapter-label">How it works</p>
+        <h2 style="margin-bottom: var(--sp-4);">A few things<br>before you begin.</h2>
+        <!-- Step rows -->
+        <div class="toc-row">
+          <div class="toc-num">→</div>
+          <div class="toc-body">
+            <p class="toc-title">Go at your own pace</p>
+            <p class="toc-desc">Move through all three chapters in one sitting, or spread it out over a few days. There's no right way and no timeline.</p>
+          </div>
+        </div>
+        <div class="toc-divider"></div>
+        <div class="toc-row">
+          <div class="toc-num">→</div>
+          <div class="toc-body">
+            <p class="toc-title">Write what's true</p>
+            <p class="toc-desc">Each screen has a prompt. Just write — there are no wrong answers, no grades, and no one watching. It's just you.</p>
+          </div>
+        </div>
+        <div class="toc-divider"></div>
+        <div class="toc-row">
+          <div class="toc-num">→</div>
+          <div class="toc-body">
+            <p class="toc-title">Save your place anytime</p>
+            <p class="toc-desc">Tap "Save my place" on any screen and your spot will be waiting for you when you come back.</p>
+          </div>
+        </div>
+        <div class="toc-divider"></div>
+        <div class="toc-row">
+          <div class="toc-num">→</div>
+          <div class="toc-body">
+            <p class="toc-title">Go back if you need to</p>
+            <p class="toc-desc">Use the back arrow at the top of the buttons to revisit any screen. Your writing is always saved as you type.</p>
+          </div>
+        </div>
+        <div class="toc-divider"></div>
+        <div class="toc-row">
+          <div class="toc-num">→</div>
+          <div class="toc-body">
+            <p class="toc-title">Your words stay private</p>
+            <p class="toc-desc">Everything you write is stored only on your device. Nothing is sent anywhere or seen by anyone else.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo('toc')">I'm ready — show me what's inside</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN TOC — WHAT'S INSIDE
+       =========================================================== -->
+  <section class="screen" id="screen-toc" data-screen="toc">
+    <div class="screen-content">
+      <div>
+        <p class="chapter-label">What's inside</p>
+        <h2 style="margin-bottom: var(--sp-4);">Three chapters.<br>One quiet journey.</h2>
+        <!-- Chapter 1 row -->
+        <div class="toc-row">
+          <div class="toc-num">01</div>
+          <div class="toc-body">
+            <p class="toc-title">Feel It First</p>
+            <p class="toc-desc">Honor what you're carrying. Name what's true. Give yourself permission to feel it — without performing okay.</p>
+          </div>
+        </div>
+        <div class="toc-divider"></div>
+        <!-- Chapter 2 row -->
+        <div class="toc-row">
+          <div class="toc-num">02</div>
+          <div class="toc-body">
+            <p class="toc-title">Find Your Footing</p>
+            <p class="toc-desc">Rediscover what's still yours. Remember who you were before the role. Find the ground beneath your feet.</p>
+          </div>
+        </div>
+        <div class="toc-divider"></div>
+        <!-- Chapter 3 row -->
+        <div class="toc-row">
+          <div class="toc-num">03</div>
+          <div class="toc-body">
+            <p class="toc-title">Step Into What's Next</p>
+            <p class="toc-desc">Not a reinvention — a direction. Name your next chapter and take one small, real step toward it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(3)">Begin Chapter One</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 3 — CHAPTER 1 INTRO
+       =========================================================== -->
+  <section class="screen chapter-intro" id="screen-3" data-screen="3" data-chapter="1">
+    <div class="screen-content">
+      <div>
+        <p class="chapter-number">Chapter One</p>
+        <h1>Feel It First</h1>
+        <p style="margin-top: var(--sp-3);">Before the reinvention, the plans, the figuring it out — before any of that — this chapter just asks one thing of you:</p>
+        <p><em>Feel it.</em></p>
+        <p>Whatever you walked in here carrying, it belongs here.</p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(4)">I'm ready</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 4 — PROMPT 1
+       =========================================================== -->
+  <section class="screen" id="screen-4" data-screen="4" data-chapter="1">
+    <div class="screen-content">
+      <div>
+        <p>You don't have to perform okay right now.</p>
+        <p>Take a breath.</p>
+        <h2>What's actually going on for you right now?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-1); font-size: 14px;">No wrong answers. Just write what's true.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-4"
+        placeholder="Start writing here…"
+        oninput="autoExpand(this); saveResponse('prompt_1', this.value)"
+        aria-label="Your response to prompt 1"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(5)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 5 — PROMPT 2
+       =========================================================== -->
+  <section class="screen" id="screen-5" data-screen="5" data-chapter="1">
+    <div class="screen-content">
+      <div>
+        <p>What you're feeling makes sense.</p>
+        <p style="color: var(--color-text-muted); font-size: 16px; line-height: 1.8;">The grief, the restlessness, the strange mix of proud and lost — it all makes sense. You built your life around someone. And now the shape of your days has changed.</p>
+        <h2>What's the hardest part of that — the part you haven't quite said out loud?</h2>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-5"
+        placeholder="You can say it here…"
+        oninput="autoExpand(this); saveResponse('prompt_2', this.value)"
+        aria-label="Your response to prompt 2"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(6)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 6 — VALIDATION PAUSE
+       =========================================================== -->
+  <section class="screen" id="screen-6" data-screen="6" data-chapter="1">
+    <div class="screen-content">
+      <p class="text-muted" style="font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;">Read this slowly.</p>
+      <div class="pause-card">
+        <p><em>You are not failing at the empty nest.</em><br>
+        <em>You are not too sensitive.</em><br>
+        <em>You are not behind.</em></p>
+        <div class="ornament"></div>
+        <p>You are a mother who loved her children well enough that their leaving left a mark.</p>
+        <p>That's not a flaw.<br>That's love. That's real.</p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(7)">I needed that. Continue.</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 7 — PROMPT 3
+       =========================================================== -->
+  <section class="screen" id="screen-7" data-screen="7" data-chapter="1">
+    <div class="screen-content">
+      <div>
+        <h2>What have you been pretending is fine — that isn't quite fine yet?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2);">You don't have to fix it.<br>You just have to name it.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-7"
+        placeholder="It's safe to say it here…"
+        oninput="autoExpand(this); saveResponse('prompt_3', this.value)"
+        aria-label="Your response to prompt 3"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(8)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 8 — PROMPT 4
+       =========================================================== -->
+  <section class="screen" id="screen-8" data-screen="8" data-chapter="1">
+    <div class="screen-content">
+      <div>
+        <p>Sometimes the heaviest things are the ones nobody sees.</p>
+        <h2>If you could say one honest thing about this season — to someone who would really listen — what would it be?</h2>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-8"
+        placeholder="Say it here…"
+        oninput="autoExpand(this); saveResponse('prompt_4', this.value)"
+        aria-label="Your response to prompt 4"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(9)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 9 — CHAPTER 1 CLOSING
+       =========================================================== -->
+  <section class="screen" id="screen-9" data-screen="9" data-chapter="1">
+    <div class="screen-content">
+      <div>
+        <h2>That took something.</h2>
+        <p style="margin-top: var(--sp-3);">You told the truth — maybe for the first time in a while. You didn't minimize it or rush past it or explain it away.</p>
+        <p>That matters more than you know.</p>
+        <div class="ornament"></div>
+        <p style="color: var(--color-text-muted);">The feelings you named are real.<br>They always were.<br>And now you've actually looked at them.</p>
+        <p><em>That's where everything starts.</em></p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(10)">Continue to Chapter 2</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 10 — CHAPTER 2 INTRO
+       =========================================================== -->
+  <section class="screen chapter-intro" id="screen-10" data-screen="10" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <p class="chapter-number">Chapter Two</p>
+        <h1>Find Your Footing</h1>
+        <p style="margin-top: var(--sp-3);">Most people skip this part.</p>
+        <p style="color: var(--color-text-muted); font-size: 16px; line-height: 1.8;">They want to jump straight from "I feel lost" to "I have a plan." But there's something important in the space between those two places — and that's exactly where we're going.</p>
+        <p>It's the gap between who you were and who you're becoming.<br>It doesn't feel like much. But there's more here than you think.</p>
+        <p><em>Let's see what's already here.</em></p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(11)">I'm ready</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 11 — PROMPT 5
+       =========================================================== -->
+  <section class="screen" id="screen-11" data-screen="11" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <p>Before we look forward, let's just look around for a second.</p>
+        <h2>What's still here — in your days, your home, your life — that's just… yours?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-1); font-size: 14px;">Doesn't have to be meaningful. A morning coffee. A walk you take. A show nobody else in the house ever watched with you.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-11"
+        placeholder="What's already yours…"
+        oninput="autoExpand(this); saveResponse('prompt_5', this.value)"
+        aria-label="Your response to prompt 5"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(12)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 12 — PROMPT 6
+       =========================================================== -->
+  <section class="screen" id="screen-12" data-screen="12" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <h2>When do you feel most like yourself?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 15px; line-height: 1.8;">Not the mom version. Not the one who's holding it together for everyone else.<br>The you underneath all of that.<br><br>Even if it only shows up in little flickers — what does it feel like?</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-12"
+        placeholder="Even just a flicker…"
+        oninput="autoExpand(this); saveResponse('prompt_6', this.value)"
+        aria-label="Your response to prompt 6"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(13)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 13 — GROUNDING PAUSE
+       =========================================================== -->
+  <section class="screen" id="screen-13" data-screen="13" data-chapter="2">
+    <div class="screen-content">
+      <p class="text-muted" style="font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase;">Here's something true.</p>
+      <div class="pause-card">
+        <p><em>You were a person before you were a mother.</em></p>
+        <div class="ornament"></div>
+        <p>That person didn't disappear.<br>She got quieter. She got patient. She waited.</p>
+        <p>She's still here.</p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(14)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 14 — PROMPT 7
+       =========================================================== -->
+  <section class="screen" id="screen-14" data-screen="14" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <h2>Who were you before the role took over?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 15px; line-height: 1.8;">What did you care about?<br>What made you lose track of time?<br>What did you want that you set aside — not forever, just for now?</p>
+        <p style="font-size: 15px; color: var(--color-text-muted);">Let yourself remember.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-14"
+        placeholder="Let yourself remember…"
+        oninput="autoExpand(this); saveResponse('prompt_7', this.value)"
+        aria-label="Your response to prompt 7"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(15)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 15 — PROMPT 8
+       =========================================================== -->
+  <section class="screen" id="screen-15" data-screen="15" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <h2>What's one thing you've always <em>been</em> — not done, just been — that has nothing to do with your kids?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 14px; line-height: 1.8;">Curious. Creative. Funny. Calm. Restless.<br>A maker. A thinker. A nurturer in broader ways.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-15"
+        placeholder="Something you've always been…"
+        oninput="autoExpand(this); saveResponse('prompt_8', this.value)"
+        aria-label="Your response to prompt 8"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(16)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 16 — PROMPT 9
+       =========================================================== -->
+  <section class="screen" id="screen-16" data-screen="16" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <h2>What has this season quietly given you — even if you didn't ask for it?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 15px; line-height: 1.8;">More time. More silence. More room.<br>Something unexpected.</p>
+        <p style="font-size: 15px; color: var(--color-text-muted);">You don't have to be grateful for it yet.<br>Just notice if anything is there.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-16"
+        placeholder="Just notice…"
+        oninput="autoExpand(this); saveResponse('prompt_9', this.value)"
+        aria-label="Your response to prompt 9"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(17)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 17 — REFLECTION PAUSE
+       =========================================================== -->
+  <section class="screen" id="screen-17" data-screen="17" data-chapter="2">
+    <div class="screen-content">
+      <div class="pause-card">
+        <p style="font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-muted); margin-bottom: var(--sp-3);">Scroll back up for a second.</p>
+        <p>Read what you wrote.</p>
+        <p style="color: var(--color-text-muted);">Not to judge it.<br>Just to really see it.</p>
+        <div class="ornament"></div>
+        <p><em>There's more of you in there than you realized.</em></p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(18)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 18 — PROMPT 10
+       =========================================================== -->
+  <section class="screen" id="screen-18" data-screen="18" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <h2>What small thing could you do this week — just for you — that would feel like coming home to yourself?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 14px;">Not a project. Not a plan.<br>One small, real thing.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-18"
+        placeholder="One small, real thing…"
+        oninput="autoExpand(this); saveResponse('prompt_10', this.value)"
+        aria-label="Your response to prompt 10"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(19)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 19 — CHAPTER 2 CLOSING
+       =========================================================== -->
+  <section class="screen" id="screen-19" data-screen="19" data-chapter="2">
+    <div class="screen-content">
+      <div>
+        <h2>Something shifted in there.</h2>
+        <p style="margin-top: var(--sp-3);">Maybe you remembered something about yourself you'd tucked away.<br>Maybe you felt a little less like a stranger in your own life.<br>Maybe you just feel slightly more solid than when you started.</p>
+        <p>Any of that is enough.</p>
+        <div class="ornament"></div>
+        <p style="color: var(--color-text-muted);">The ground is a little more solid now.</p>
+        <p><em>You're still becoming. That's not a problem.<br>That's the whole point.</em></p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(20)">Continue to Chapter 3</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 20 — CHAPTER 3 INTRO
+       =========================================================== -->
+  <section class="screen chapter-intro" id="screen-20" data-screen="20" data-chapter="3">
+    <div class="screen-content">
+      <div>
+        <p class="chapter-number">Chapter Three</p>
+        <h1>Step Into What's Next</h1>
+        <p style="margin-top: var(--sp-3);">This chapter isn't asking you to have it all figured out.</p>
+        <p style="color: var(--color-text-muted); font-size: 16px; line-height: 1.8;">It just asks you to look up — gently, without pressure — toward what might actually be waiting for you.</p>
+        <p>Not a reinvention. Not a five-year plan.<br>Just a direction. A whisper of something.</p>
+        <p><em>You've earned this part.</em></p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(21)">I'm ready</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 21 — PROMPT 11
+       =========================================================== -->
+  <section class="screen" id="screen-21" data-screen="21" data-chapter="3">
+    <div class="screen-content">
+      <div>
+        <h2>If the next chapter of your life had a feeling to it — not a plan, just a feeling — what would you want it to feel like?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 14px; line-height: 1.8;">Spacious. Purposeful. Creative. Connected.<br>Adventurous. Peaceful. Something else entirely.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-21"
+        placeholder="A feeling, not a plan…"
+        oninput="autoExpand(this); saveResponse('prompt_11', this.value)"
+        aria-label="Your response to prompt 11"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(22)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 22 — PROMPT 12
+       =========================================================== -->
+  <section class="screen" id="screen-22" data-screen="22" data-chapter="3">
+    <div class="screen-content">
+      <div>
+        <h2>What's something you've said "someday" about that might actually be ready for "now"?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 14px; line-height: 1.8;">It doesn't have to be big.<br>Someday I'll take that class. Travel somewhere alone. Finally learn that thing I keep saying I'll learn.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-22"
+        placeholder="A someday that might be now…"
+        oninput="autoExpand(this); saveResponse('prompt_12', this.value)"
+        aria-label="Your response to prompt 22"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(23)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 23 — PROMPT 13
+       =========================================================== -->
+  <section class="screen" id="screen-23" data-screen="23" data-chapter="3">
+    <div class="screen-content">
+      <div>
+        <h2>What would it look like if you stopped waiting to feel ready — and just began?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-2); font-size: 14px;">Not perfectly. Not all at once.<br>Just began.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-23"
+        placeholder="What beginning looks like…"
+        oninput="autoExpand(this); saveResponse('prompt_13', this.value)"
+        aria-label="Your response to prompt 13"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(24)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 24 — NAMING THE CHAPTER
+       =========================================================== -->
+  <section class="screen" id="screen-24" data-screen="24" data-chapter="3">
+    <div class="screen-content">
+      <div>
+        <p>Look how far you've come in here.</p>
+        <p style="color: var(--color-text-muted); font-size: 15px;">You felt it.<br>You found your footing.<br>And now —</p>
+        <h2>If you were going to give this next chapter of your life a name — just for yourself, just for now — what would you call it?</h2>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-24"
+        placeholder="My next chapter is called…"
+        oninput="autoExpand(this); saveResponse('prompt_chapter_name', this.value)"
+        aria-label="Name your next chapter"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(25)">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 25 — ONE FIRST STEP
+       =========================================================== -->
+  <section class="screen" id="screen-25" data-screen="25" data-chapter="3">
+    <div class="screen-content">
+      <div>
+        <p>You don't need a plan.<br>You need one step.</p>
+        <h2>What's one small, real thing you could do in the next 48 hours that feels like the beginning of that chapter?</h2>
+        <p class="text-muted" style="margin-top: var(--sp-1); font-size: 14px;">Not a task. A beginning.</p>
+      </div>
+      <textarea
+        class="prompt-input"
+        id="input-25"
+        placeholder="My one first step…"
+        oninput="autoExpand(this); saveResponse('prompt_first_step', this.value)"
+        aria-label="Your one first step"
+      ></textarea>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="completeJourney()">Continue</button>
+      <button class="btn-secondary" onclick="savePlace()">Save my place</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 26 — FINAL ENCOURAGEMENT
+       =========================================================== -->
+  <section class="screen" id="screen-26" data-screen="26">
+    <div class="screen-content">
+      <div>
+        <h2>You actually did it.</h2>
+        <p style="margin-top: var(--sp-3);">Not perfectly — but genuinely. You showed up for yourself, which is harder than it sounds.</p>
+        <p>You sat with what you've been carrying.<br>You found pieces of yourself you'd set aside.<br>You named something that matters — even if it still feels a little tender and uncertain.</p>
+        <div class="ornament"></div>
+        <p style="color: var(--color-text-muted);">That's not nothing. That's everything.</p>
+        <p style="color: var(--color-text-muted); font-size: 15px; line-height: 1.8;">Most moms never stop long enough to do what you just did.</p>
+        <div class="ornament"></div>
+        <p>You're not behind.<br>You're not broken.<br>You're right in the middle of something that's quietly turning into something beautiful.</p>
+        <p><em>Keep going. You're worth this next chapter.</em></p>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(27)">Complete my journey</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 27 — CLOSING SCREEN
+       =========================================================== -->
+  <section class="screen" id="screen-27" data-screen="27">
+    <div class="screen-content">
+      <div>
+        <p class="welcome-title" style="font-size: clamp(26px, 5vw, 36px);">Empty Nest<br>to Next</p>
+        <div class="ornament"></div>
+        <p style="color: var(--color-text-muted); font-size: 15px; line-height: 1.9;">You came here. That says something.</p>
+        <p style="font-size: 15px; line-height: 1.9;">Come back whenever you need to — to feel it again, to find your footing again, or just to remember what you wrote in here.</p>
+        <p style="color: var(--color-text-muted); font-size: 15px; margin-top: var(--sp-2);">And if you know another mom who needs this —<br><em>please tell her.</em></p>
+        <div class="ornament" style="margin-top: var(--sp-4);"></div>
+        <p style="font-size: 14px; color: var(--color-text-muted); line-height: 1.8; margin-top: var(--sp-3);">Ready to go deeper? There's more waiting for you at</p>
+        <a href="https://thesndbloom.com" target="_blank" class="cover-site" style="font-size: 14px; color: var(--color-sage); text-decoration: none; letter-spacing: 0.08em; display: block; margin-top: 4px;">thesndbloom.com</a>
+      </div>
+    </div>
+    <div class="btn-area">
+      <button class="btn-primary" onclick="goTo(28)">Read my journey</button>
+      <button class="btn-secondary" onclick="goTo(29)">Track my progress</button>
+      <button class="btn-secondary" onclick="revisitJourney()">Revisit the journey</button>
+      <button class="btn-secondary" onclick="confirmReset()">Start fresh</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 28 — MY JOURNEY SUMMARY
+       =========================================================== -->
+  <section class="screen" id="screen-28" data-screen="28">
+    <div class="screen-content" id="journey-summary-content">
+      <!-- Populated dynamically by buildJourneySummary() -->
+    </div>
+    <div class="btn-area" style="padding-bottom: var(--sp-5);">
+      <button class="btn-primary" onclick="printJourney()">Save or print my journey</button>
+      <button class="btn-secondary" onclick="goTo(27)">← Back</button>
+    </div>
+  </section>
+  <!-- ===========================================================
+       SCREEN 29 — PROGRESS TRACKER
+       =========================================================== -->
+  <section class="screen" id="screen-29" data-screen="29">
+    <div class="screen-content" id="tracker-content">
+      <div>
+        <p class="chapter-label">My progress</p>
+        <h2 id="tracker-chapter-name" style="margin-bottom: var(--sp-1);">My next chapter</h2>
+        <p id="tracker-first-step" class="text-muted" style="font-size: 15px; line-height: 1.7; margin-bottom: var(--sp-4);"></p>
+      </div>
+      <!-- Win log -->
+      <div>
+        <p style="font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-sage); margin-bottom: var(--sp-2);">My wins so far</p>
+        <div id="tracker-wins-list"></div>
+        <div style="display: flex; gap: var(--sp-2); margin-top: var(--sp-2); align-items: flex-start;">
+          <textarea
+            id="tracker-new-win"
+            class="prompt-input"
+            placeholder="Something I did, noticed, or felt proud of…"
+            style="min-height: 72px; flex: 1;"
+            oninput="autoExpand(this)"
+          ></textarea>
+        </div>
+        <button class="btn-primary" onclick="addWin()" style="margin-top: var(--sp-2);">Add this win</button>
+      </div>
+      <!-- Check-in note -->
+      <div style="margin-top: var(--sp-2);">
+        <p style="font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-sage); margin-bottom: var(--sp-2);">How I'm doing today</p>
+        <textarea
+          id="tracker-checkin"
+          class="prompt-input"
+          placeholder="A quick check-in — how are you feeling right now?"
+          style="min-height: 100px;"
+          oninput="autoExpand(this); saveTrackerCheckin(this.value)"
+        ></textarea>
+        <p style="font-size: 12px; color: var(--color-text-muted); margin-top: 6px;">Clears each visit — just for right now.</p>
+      </div>
+    </div>
+    <div class="btn-area" style="padding-bottom: var(--sp-5);">
+      <button class="btn-secondary" onclick="goTo(27)">← Back</button>
+    </div>
+  </section>
+</div><!-- /#app -->
+<script>
+  /* ============================================================
+     CONFIGURATION — easy to edit
+     ============================================================ */
+  const TOTAL_SCREENS = 29;
+  // Which chapter each screen belongs to (null = no chapter)
+  const CHAPTER_MAP = {
+    1: null, 2: null, 'how-to': null, toc: null,
+    3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1,
+    10: 2, 11: 2, 12: 2, 13: 2, 14: 2, 15: 2, 16: 2, 17: 2, 18: 2, 19: 2,
+    20: 3, 21: 3, 22: 3, 23: 3, 24: 3, 25: 3,
+    26: null, 27: null, 28: null, 29: null
+  };
+  const STORAGE_PREFIX = 'fete_'; // prefix for all localStorage keys
+  /* ============================================================
+     STATE
+     ============================================================ */
+  let currentScreen = 1;
+  let responses     = {};
+  /* ============================================================
+     INIT — runs on page load
+     ============================================================ */
+  function init() {
+    const saved    = localStorage.getItem(STORAGE_PREFIX + 'current_screen');
+    const complete = localStorage.getItem(STORAGE_PREFIX + 'complete') === 'true';
+    responses      = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'responses') || '{}');
+    // Clear any active screens set in HTML
+    document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+    if (complete) {
+      // Journey finished — go to closing screen
+      currentScreen = 27;
+    } else if (saved) {
+      const parsed  = parseInt(saved, 10);
+      const savedScreen = isNaN(parsed) ? saved : parsed;
+      // Only restore if they were mid-journey (screen 3+)
+      // Cover and intro screens always show fresh
+      const isDeepEnough = (typeof savedScreen === 'number' && savedScreen >= 3)
+                        || savedScreen === 'toc';
+      currentScreen = isDeepEnough ? savedScreen : 1;
+    } else {
+      currentScreen = 1;
+    }
+    showScreen(currentScreen, false);
+    restoreInputs();
+    injectBackButtons();
+  }
+  /* ============================================================
+     NAVIGATION
+     ============================================================ */
+  // History stack — tracks screens visited so back always works
+  let screenHistory = [];
+  function goTo(n) {
+    const current = document.getElementById('screen-' + currentScreen);
+    if (!current) return;
+    // Push current screen onto history before leaving
+    screenHistory.push(currentScreen);
+    // Fade out current screen
+    current.style.opacity    = '0';
+    current.style.transform  = 'translateY(-8px)';
+    current.style.transition = 'opacity 300ms ease, transform 300ms ease';
+    setTimeout(() => {
+      current.classList.remove('active');
+      current.style.cssText  = '';
+      currentScreen          = n;
+      showScreen(n, true);
+      saveProgress();
+    }, 300);
+  }
+  function goBack() {
+    if (screenHistory.length === 0) return;
+    const prev    = screenHistory.pop();
+    const current = document.getElementById('screen-' + currentScreen);
+    if (!current) return;
+    // Fade out — slide right (reverse direction)
+    current.style.opacity    = '0';
+    current.style.transform  = 'translateY(8px)';
+    current.style.transition = 'opacity 300ms ease, transform 300ms ease';
+    setTimeout(() => {
+      current.classList.remove('active');
+      current.style.cssText = '';
+      currentScreen         = prev;
+      showScreen(prev, true);
+      saveProgress();
+    }, 300);
+  }
+  // Inject a back button at the top of every screen's btn-area
+  // except screen-1 (no previous screen to go back to)
+  function injectBackButtons() {
+    document.querySelectorAll('.screen').forEach(screen => {
+      const n = screen.dataset.screen;
+      // No back on welcome screen or completion screens
+      if (n === '1' || n === '26' || n === '27' || n === '28' || n === '29') return;
+      const btnArea = screen.querySelector('.btn-area');
+      if (!btnArea) return;
+      const back = document.createElement('button');
+      back.className   = 'btn-back';
+      back.textContent = 'Back';
+      back.setAttribute('aria-label', 'Go back');
+      back.onclick     = goBack;
+      btnArea.insertBefore(back, btnArea.firstChild);
+    });
+  }
+  function showScreen(n, animate) {
+    const target = document.getElementById('screen-' + n);
+    if (!target) return;
+    // Toggle cover background on body
+    document.body.classList.toggle('cover-visible', n === 1);
+    if (animate) {
+      // Reset then re-trigger animation
+      target.style.animation = 'none';
+      requestAnimationFrame(() => {
+        target.style.animation = '';
+        target.classList.add('active');
+      });
+    } else {
+      target.classList.add('active');
+    }
+    updateProgress(n);
+    scrollToTop();
+    // Build summary or tracker when reaching those screens
+    if (n === 28) buildJourneySummary();
+    if (n === 29) buildTracker();
+  }
+  /* ============================================================
+     PROGRESS BAR
+     ============================================================ */
+  function updateProgress(n) {
+    const bar     = document.getElementById('progress-bar');
+    const chapter = CHAPTER_MAP[n];
+    const done = (typeof n === 'number') && n >= 26;
+    // Hide on entry screens (welcome, what this is, how-to, toc)
+    if (n <= 2 || n === 'how-to' || n === 'toc') {
+      bar.classList.remove('visible');
+      return;
+    }
+    bar.classList.add('visible');
+    [1, 2, 3].forEach(ch => {
+      const seg = document.getElementById('seg-' + ch);
+      seg.classList.remove('active', 'complete');
+      if (done) {
+        seg.classList.add('complete');
+      } else if (chapter !== null && ch < chapter) {
+        seg.classList.add('complete');
+      } else if (ch === chapter) {
+        seg.classList.add('active');
+      }
+    });
+  }
+  /* ============================================================
+     LOCAL STORAGE — save and restore
+     ============================================================ */
+  function saveProgress() {
+    localStorage.setItem(STORAGE_PREFIX + 'current_screen', String(currentScreen));
+  }
+  function saveResponse(key, value) {
+    responses[key] = value;
+    localStorage.setItem(STORAGE_PREFIX + 'responses', JSON.stringify(responses));
+  }
+  function markComplete() {
+    localStorage.setItem(STORAGE_PREFIX + 'complete', 'true');
+  }
+  function resetJourney() {
+    // Dismiss the confirmation modal
+    const modal = document.getElementById('reset-confirm');
+    if (modal) modal.remove();
+    // Clear all localStorage data
+    Object.keys(localStorage)
+      .filter(k => k.startsWith(STORAGE_PREFIX))
+      .forEach(k => localStorage.removeItem(k));
+    // Clear all input fields
+    document.querySelectorAll('.prompt-input').forEach(el => {
+      el.value = '';
+      el.style.height = 'auto';
+    });
+    // Clear tracker fields
+    const newWin = document.getElementById('tracker-new-win');
+    const checkin = document.getElementById('tracker-checkin');
+    if (newWin) { newWin.value = ''; newWin.style.height = 'auto'; }
+    if (checkin) { checkin.value = ''; checkin.style.height = 'auto'; }
+    // Reset all state
+    currentScreen  = 1;
+    responses      = {};
+    screenHistory  = [];
+    // Remove active from all screens
+    document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+    // Go directly to screen 1 — no fade needed
+    showScreen(1, true);
+  }
+  function savePlace() {
+    saveProgress();
+    showToast("Your place is saved. Come back whenever you're ready.");
+  }
+  // Map of input element IDs to response storage keys
+  const INPUT_KEY_MAP = {
+    'input-4':  'prompt_1',
+    'input-5':  'prompt_2',
+    'input-7':  'prompt_3',
+    'input-8':  'prompt_4',
+    'input-11': 'prompt_5',
+    'input-12': 'prompt_6',
+    'input-14': 'prompt_7',
+    'input-15': 'prompt_8',
+    'input-16': 'prompt_9',
+    'input-18': 'prompt_10',
+    'input-21': 'prompt_11',
+    'input-22': 'prompt_12',
+    'input-23': 'prompt_13',
+    'input-24': 'prompt_chapter_name',
+    'input-25': 'prompt_first_step',
+  };
+  function restoreInputs() {
+    Object.entries(INPUT_KEY_MAP).forEach(([id, key]) => {
+      const el = document.getElementById(id);
+      if (el && responses[key]) {
+        el.value = responses[key];
+        autoExpand(el);
+      }
+    });
+  }
+  /* ============================================================
+     TEXTAREA AUTO-EXPAND
+     ============================================================ */
+  function autoExpand(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+  /* ============================================================
+     TOAST — soft non-intrusive message
+     ============================================================ */
+  function showToast(message) {
+    const existing = document.getElementById('toast');
+    if (existing) existing.remove();
+    const toast      = document.createElement('div');
+    toast.id         = 'toast';
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-text);
+      color: var(--color-bg);
+      font-family: var(--font-body);
+      font-size: 14px;
+      padding: 12px 24px;
+      border-radius: 40px;
+      max-width: 320px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 300ms ease;
+      z-index: 100;
+      white-space: normal;
+      word-break: break-word;
+    `;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => {
+      toast.style.opacity = '1';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 2800);
+    });
+  }
+  /* ============================================================
+     UTILITY
+     ============================================================ */
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  /* ============================================================
+     JOURNEY SUMMARY — builds screen 28 from saved responses
+     ============================================================ */
+  const JOURNEY_PROMPTS = [
+    {
+      chapter: 'Chapter One',
+      title:   'Feel It First',
+      entries: [
+        { key: 'prompt_1',  q: 'What\'s actually going on for you right now?' },
+        { key: 'prompt_2',  q: 'What\'s the hardest part — the part you haven\'t quite said out loud?' },
+        { key: 'prompt_3',  q: 'What have you been pretending is fine — that isn\'t quite fine yet?' },
+        { key: 'prompt_4',  q: 'If you could say one honest thing about this season, what would it be?' },
+      ]
+    },
+    {
+      chapter: 'Chapter Two',
+      title:   'Find Your Footing',
+      entries: [
+        { key: 'prompt_5',  q: 'What\'s still here — in your days, your home, your life — that\'s just yours?' },
+        { key: 'prompt_6',  q: 'When do you feel most like yourself?' },
+        { key: 'prompt_7',  q: 'Who were you before the role took over?' },
+        { key: 'prompt_8',  q: 'What\'s one thing you\'ve always been — not done, just been?' },
+        { key: 'prompt_9',  q: 'What has this season quietly given you — even if you didn\'t ask for it?' },
+        { key: 'prompt_10', q: 'What small thing could you do this week that would feel like coming home to yourself?' },
+      ]
+    },
+    {
+      chapter: 'Chapter Three',
+      title:   'Step Into What\'s Next',
+      entries: [
+        { key: 'prompt_11',       q: 'What feeling do you want the next chapter of your life to have?' },
+        { key: 'prompt_12',       q: 'What\'s something you\'ve said "someday" about that might be ready for "now"?' },
+        { key: 'prompt_13',       q: 'What would it look like if you stopped waiting to feel ready — and just began?' },
+        { key: 'prompt_chapter_name', q: 'What did you name your next chapter?' },
+        { key: 'prompt_first_step',   q: 'What\'s your one first step?' },
+      ]
+    }
+  ];
+  function buildJourneySummary() {
+    const container = document.getElementById('journey-summary-content');
+    if (!container) return;
+    let html = `
+      <div class="summary-header">
+        <h2 style="font-family: var(--font-heading); font-style: italic; font-weight: 300; font-size: clamp(24px, 5vw, 30px); line-height: 1.3;">My Journey</h2>
+        <p style="color: var(--color-text-muted); font-size: 14px; margin-top: var(--sp-1);">Empty Nest to Next &nbsp;·&nbsp; thesndbloom.com</p>
+      </div>
+    `;
+    JOURNEY_PROMPTS.forEach(chapter => {
+      html += `<div class="summary-chapter-block">`;
+      html += `<p class="summary-chapter-label">${chapter.chapter}</p>`;
+      html += `<p class="summary-chapter-title">${chapter.title}</p>`;
+      chapter.entries.forEach(entry => {
+        const answer = responses[entry.key];
+        const answerHtml = (answer && answer.trim())
+          ? `<p class="summary-answer">${escapeHtml(answer.trim())}</p>`
+          : `<p class="summary-empty">Not answered yet</p>`;
+        html += `
+          <div class="summary-entry">
+            <p class="summary-question">${entry.q}</p>
+            ${answerHtml}
+          </div>
+        `;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html;
+  }
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  function printJourney() {
+    window.print();
+  }
+  /* ============================================================
+     PROGRESS TRACKER — screen 29
+     ============================================================ */
+  function buildTracker() {
+    const chapterName = responses['prompt_chapter_name'];
+    const firstStep   = responses['prompt_first_step'];
+    const nameEl = document.getElementById('tracker-chapter-name');
+    const stepEl = document.getElementById('tracker-first-step');
+    if (nameEl) nameEl.textContent = chapterName
+      ? `"${chapterName}"`
+      : 'Your next chapter';
+    if (stepEl) stepEl.textContent = firstStep
+      ? `My first step: ${firstStep}`
+      : 'Come back after finishing Chapter 3 to see your first step here.';
+    const checkinEl = document.getElementById('tracker-checkin');
+    if (checkinEl) {
+      checkinEl.value = '';
+      checkinEl.style.height = 'auto';
+    }
+    renderWins();
+  }
+  function renderWins() {
+    const wins = getWins();
+    const list = document.getElementById('tracker-wins-list');
+    if (!list) return;
+    if (wins.length === 0) {
+      list.innerHTML = `<p class="tracker-empty-state">Your wins will show up here — add your first one above.</p>`;
+      return;
+    }
+    list.innerHTML = wins.map((win, i) => `
+      <div class="tracker-win-item">
+        <button
+          class="tracker-win-check ${win.checked ? 'checked' : ''}"
+          onclick="toggleWin(${i})"
+          aria-label="Mark as done"
+        ></button>
+        <span class="tracker-win-text ${win.checked ? 'checked' : ''}">${escapeHtml(win.text)}</span>
+        <button class="tracker-win-delete" onclick="deleteWin(${i})" aria-label="Remove">×</button>
+      </div>
+    `).join('');
+  }
+  function getWins() {
+    return JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'tracker_wins') || '[]');
+  }
+  function saveWins(wins) {
+    localStorage.setItem(STORAGE_PREFIX + 'tracker_wins', JSON.stringify(wins));
+  }
+  function addWin() {
+    const input = document.getElementById('tracker-new-win');
+    const text  = input ? input.value.trim() : '';
+    if (!text) return;
+    const wins = getWins();
+    wins.unshift({ text, checked: false });
+    saveWins(wins);
+    input.value       = '';
+    input.style.height = 'auto';
+    renderWins();
+    showToast('Win added. You should be proud of yourself.');
+  }
+  function toggleWin(i) {
+    const wins = getWins();
+    if (!wins[i]) return;
+    wins[i].checked = !wins[i].checked;
+    saveWins(wins);
+    renderWins();
+  }
+  function deleteWin(i) {
+    const wins = getWins();
+    wins.splice(i, 1);
+    saveWins(wins);
+    renderWins();
+  }
+  function saveTrackerCheckin(value) {
+    localStorage.setItem(STORAGE_PREFIX + 'tracker_checkin', value);
+  }
+  function completeJourney() {
+    markComplete();
+    goTo(26);
+  }
+  function revisitJourney() {
+    localStorage.setItem(STORAGE_PREFIX + 'current_screen', '3');
+    goTo(3);
+  }
+  function confirmReset() {
+    const toast      = document.createElement('div');
+    toast.id         = 'reset-confirm';
+    toast.innerHTML  = `
+      <p style="margin-bottom:12px; font-size:14px; line-height:1.6;">
+        This will clear all your writing and start the journey again from the beginning.
+      </p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <button onclick="resetJourney()" style="
+          background: var(--color-terra);
+          color: #fff;
+          border: none;
+          border-radius: 40px;
+          padding: 10px 24px;
+          font-family: var(--font-body);
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+        ">Yes, start fresh</button>
+        <button onclick="document.getElementById('reset-confirm').remove()" style="
+          background: none;
+          border: none;
+          color: var(--color-text-muted);
+          font-family: var(--font-body);
+          font-size: 14px;
+          cursor: pointer;
+          text-decoration: underline;
+          padding: 10px 16px;
+        ">Never mind</button>
+      </div>
+    `;
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 320px;
+      width: calc(100% - 48px);
+      text-align: center;
+      z-index: 100;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      animation: screenFadeIn 300ms ease forwards;
+    `;
+    const existing = document.getElementById('reset-confirm');
+    if (existing) existing.remove();
+    document.body.appendChild(toast);
+  }
+  /* ============================================================
+     START
+     ============================================================ */
+  document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
